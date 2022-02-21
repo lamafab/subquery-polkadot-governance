@@ -1,57 +1,48 @@
-type StarterEntity @entity {
-
-  id: ID! #id is a required field
-
-  field1: Int!
-
-  field2: String #filed2 is an optional field
-
-  field3: BigInt
-
-  field4: Date
-
-  field5: Boolean
-
-
-
-}
-
+# Event: A motion has been proposed by a public account.
 type Proposed {
   proposal_index: Int!
   deposit: BigInt!
 }
 
+# Event: A public proposal has been tabled for referendum vote.
 type Tabled {
   proposal_index: Int!
   deposit: BigInt!
   depositors: [String!]!
 }
 
+# Event: An external proposal has been tabled.
 type ExternalTabled {}
 
+# Event: A referendum has begun.
 type Started {
   ref_index: Int!
   threshold: VoteThreshold!
 }
 
+# Event: A means of determining if a vote is past pass threshold.
 enum VoteThreshold {
   SUPER_MAJORITY_APPROVE
   SUPER_MAJORITY_AGAINST
   SIMPLE_MAJORITY
 }
 
+# A proposal has been approved by referendum.
 type Passed {
   ref_index: Int!
 }
 
+# Event: A proposal has been rejected by referendum.
 type NotPassed {
   ref_index: Int!
 }
 
+# Event: A referendum has been cancelled.
 type Cancelled {
   ref_index: Int!
 }
 
+# Event: A proposal has been enacted.
 type Executed {
   ref_index: Int!
   resultType: dispatchResult!
@@ -64,6 +55,7 @@ enum dispatchResult {
   ERR
 }
 
+# More information about the dispatch error.
 type executedError {
   type: DispatchError
   # Non-null if `type == DispatchError::OTHER`
@@ -72,8 +64,11 @@ type executedError {
   module: ModuleError 
   # Non-null if `type == DispatchError::TOKEN`
   token: TokenError 
+  # Non-null if `type == ArithmeticError::ARITHMETIC`
+  arithmetic: ArithmeticError
 }
 
+# Reason why a dispatch call failed.
 enum DispatchError {
   # Some error occurred.
   OTHER
@@ -95,6 +90,7 @@ enum DispatchError {
   ARITHMETIC
 }
 
+# Reason why a pallet call failed.
 type ModuleError {
   # Module index, matching the metadata module index.
   index: Int!
@@ -104,6 +100,7 @@ type ModuleError {
   message: String
 }
 
+# Description of what went wrong when trying to complete an operation on a token.
 enum TokenError {
   # Funds are unavailable.
   NO_FUNDS
@@ -121,43 +118,58 @@ enum TokenError {
   UNSUPPORTED
 }
 
+# Arithmetic errors.
+enum ArithmeticError {
+  UNDERFLOW
+  OVERFLOW
+  DIVISION_BY_ZERO
+}
+
+# Event: An account has delegated their vote to another account.
 type Delegated {
   who: String!
   target: String!
 }
 
+# Event: An account has cancelled a previous delegation operation.
 type Undelegated {
   account: String!
 }
 
+# Event: An external proposal has been vetoed.
 type Vetoed {
   who: String!
   proposal_hash: String!
   until: Int!
 }
 
+# Event: A proposal's preimage was noted, and the deposit taken.
 type PreimageNoted {
   proposal_hash: String!
   who: String!
   deposit: BigInt!
 }
 
+# Event: A proposal preimage was removed and used (the deposit was returned).
 type PreimageUsed {
   proposal_hash: String!
   provider: String!
   deposit: BigInt!
 }
 
+# Event: A proposal could not be executed because its preimage was invalid.
 type PreimageInvalid {
   proposal_hash: String!
   ref_index: Int!
 }
 
+# Event: A proposal could not be executed because its preimage was missing.
 type PreimageMissing {
   proposal_hash: String!
   ref_index: Int!
 }
 
+# Event: A registered preimage was removed and the deposit collected by the reaper.
 type PreiamgeReaped {
   proposal_hash: String!
   provider: String!
@@ -165,10 +177,12 @@ type PreiamgeReaped {
   reaper: String!
 }
 
+# Event: A proposal_hash has been blacklisted permanently.
 type Blacklisted {
   proposal_hash: String!
 }
 
+# Event: An account has voted in a referendum.
 type Voted {
   voter: String!
   ref_index: Int!
@@ -179,21 +193,28 @@ type Voted {
   voteSplit: VoteSplit!
 }
 
+# A vote for a referendum of a particular account.
 enum VoteType {
+  # A standard vote, one-way (approve or reject) with a given amount of conviction.
   STANDARD
+  # A split vote with balances given for both ways, and with no conviction, useful for
+	# parachains when voting.
   SPLIT
 }
 
+# A value denoting the strength of conviction of a vote.
 type VoteStandard {
   vote: Vote!
   balance: BigInt!
 }
 
+# A number of lock periods, plus a vote, one way or the other.
 type Vote {
   aye: Boolean
   conviction: Conviction
 }
 
+# A value denoting the strength of conviction of a vote.
 type Conviction {
   # 0.1x votes, unlocked.
   NONE
@@ -211,7 +232,15 @@ type Conviction {
   LOCKED_6X
 }
 
+# A split vote with balances given for both ways, and with no conviction, useful for
+# parachains when voting.
 type VoteSplit {
   aye: BigInt!
   nay: BigInt!
+}
+
+# Event: An account has secconded a proposal.
+type Seconded {
+  seconder: String!
+  prop_index: Int!
 }
