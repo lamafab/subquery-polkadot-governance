@@ -15,3 +15,203 @@ type StarterEntity @entity {
 
 
 }
+
+type Proposed {
+  proposal_index: Int!
+  deposit: BigInt!
+}
+
+type Tabled {
+  proposal_index: Int!
+  deposit: BigInt!
+  depositors: [String!]!
+}
+
+type ExternalTabled {}
+
+type Started {
+  ref_index: Int!
+  threshold: VoteThreshold!
+}
+
+enum VoteThreshold {
+  SUPER_MAJORITY_APPROVE
+  SUPER_MAJORITY_AGAINST
+  SIMPLE_MAJORITY
+}
+
+type Passed {
+  ref_index: Int!
+}
+
+type NotPassed {
+  ref_index: Int!
+}
+
+type Cancelled {
+  ref_index: Int!
+}
+
+type Executed {
+  ref_index: Int!
+  resultType: dispatchResult!
+  # Non-null if `resultType == dispatchResult::ERR`
+  error: executedError
+}
+
+enum dispatchResult {
+  OK
+  ERR
+}
+
+type executedError {
+  type: DispatchError
+  # Non-null if `type == DispatchError::OTHER`
+  other: String
+  # Non-null if `type == DispatchError::MODULE`
+  module: ModuleError 
+  # Non-null if `type == DispatchError::TOKEN`
+  token: TokenError 
+}
+
+enum DispatchError {
+  # Some error occurred.
+  OTHER
+  # Failed to lookup some data..
+  CANNOT_LOOKUP
+  # A bad origin.
+  BAD_ORIGIN
+  # A custom error in a module.
+  MODULE
+  # At least one consumer is remaining so the account cannot be destroyed.
+  CONSUMER_REMAINING
+  # There are no providers so the account cannot be created.
+  NO_PROVIDERS
+  # There are too many consumers so the account cannot be created.
+  TOO_MANY_CONSUMERS
+  # An error to do with tokens.
+  TOKEN
+  # An arithmetic error.
+  ARITHMETIC
+}
+
+type ModuleError {
+  # Module index, matching the metadata module index.
+  index: Int!
+  # Module specific error value.
+  error: Int!
+  # Optional error message.
+  message: String
+}
+
+enum TokenError {
+  # Funds are unavailable.
+  NO_FUNDS
+  # Account that must exist would die.
+  WOULD_DIE
+  # Account cannot exist with the funds that would be given.
+  BELOW_MINIMUM
+  # Account cannot be created.
+  CANNOT_CREATE
+  # The asset in question is unknown.
+  UNKNOWN_ASSET
+  # Funds exist but are frozen.
+  FROZEN
+  # Operation is not supported by the asset.
+  UNSUPPORTED
+}
+
+type Delegated {
+  who: String!
+  target: String!
+}
+
+type Undelegated {
+  account: String!
+}
+
+type Vetoed {
+  who: String!
+  proposal_hash: String!
+  until: Int!
+}
+
+type PreimageNoted {
+  proposal_hash: String!
+  who: String!
+  deposit: BigInt!
+}
+
+type PreimageUsed {
+  proposal_hash: String!
+  provider: String!
+  deposit: BigInt!
+}
+
+type PreimageInvalid {
+  proposal_hash: String!
+  ref_index: Int!
+}
+
+type PreimageMissing {
+  proposal_hash: String!
+  ref_index: Int!
+}
+
+type PreiamgeReaped {
+  proposal_hash: String!
+  provider: String!
+  deposit: BigInt!
+  reaper: String!
+}
+
+type Blacklisted {
+  proposal_hash: String!
+}
+
+type Voted {
+  voter: String!
+  ref_index: Int!
+  voteType: VoteType!
+  # Non-null if `vote == DispatchError::STANDARD`
+  voteStandard: VoteStandard!
+  # Non-null if `vote == DispatchError::SPLIT`
+  voteSplit: VoteSplit!
+}
+
+enum VoteType {
+  STANDARD
+  SPLIT
+}
+
+type VoteStandard {
+  vote: Vote!
+  balance: BigInt!
+}
+
+type Vote {
+  aye: Boolean
+  conviction: Conviction
+}
+
+type Conviction {
+  # 0.1x votes, unlocked.
+  NONE
+  # 1x votes, locked for an enactment period following a successful vote.
+  LOCKED_1X
+  # 2x votes, locked for 2x enactment periods following a successful vote.
+  LOCKED_2X
+  # 3x votes, locked for 4x...
+  LOCKED_3X
+  # 4x votes, locked for 8x...
+  LOCKED_4X
+  # 5x votes, locked for 16x...
+  LOCKED_5X
+  # 6x votes, locked for 32x...
+  LOCKED_6X
+}
+
+type VoteSplit {
+  aye: BigInt!
+  nay: BigInt!
+}
