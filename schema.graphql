@@ -1,27 +1,32 @@
 # Event: A motion has been proposed by a public account.
 type Proposed @entity {
+  id: ID!
   proposal_index: Int!
   deposit: BigInt!
 }
 
 # Event: A public proposal has been tabled for referendum vote.
 type Tabled @entity {
+  id: ID!
   proposal_index: Int!
   deposit: BigInt!
   depositors: [String!]!
 }
 
 # Event: An external proposal has been tabled.
-type ExternalTabled @entity {}
+type ExternalTabled @entity {
+  id: ID!
+}
 
 # Event: A referendum has begun.
 type Started @entity {
+  id: ID!
   ref_index: Int!
   threshold: VoteThreshold!
 }
 
-# Event: A means of determining if a vote is past pass threshold.
-enum VoteThreshold @entity {
+# A means of determining if a vote is past pass threshold.
+enum VoteThreshold {
   SUPER_MAJORITY_APPROVE
   SUPER_MAJORITY_AGAINST
   SIMPLE_MAJORITY
@@ -34,23 +39,26 @@ type Passed @entity {
 
 # Event: A proposal has been rejected by referendum.
 type NotPassed @entity {
+  id: ID!
   ref_index: Int!
 }
 
 # Event: A referendum has been cancelled.
 type Cancelled @entity {
+  id: ID!
   ref_index: Int!
 }
 
 # Event: A proposal has been enacted.
 type Executed @entity {
+  id: ID!
   ref_index: Int!
   resultType: dispatchResult!
   # Non-null if `resultType == dispatchResult::ERR`
   error: executedError
 }
 
-enum dispatchResult @entity {
+enum dispatchResult {
   OK
   ERR
 }
@@ -69,7 +77,7 @@ type executedError @entity {
 }
 
 # Reason why a dispatch call failed.
-enum DispatchError @entity {
+enum DispatchError {
   # Some error occurred.
   OTHER
   # Failed to lookup some data..
@@ -101,7 +109,7 @@ type ModuleError @entity {
 }
 
 # Description of what went wrong when trying to complete an operation on a token.
-enum TokenError @entity {
+enum TokenError {
   # Funds are unavailable.
   NO_FUNDS
   # Account that must exist would die.
@@ -119,7 +127,7 @@ enum TokenError @entity {
 }
 
 # Arithmetic errors.
-enum ArithmeticError @entity {
+enum ArithmeticError {
   UNDERFLOW
   OVERFLOW
   DIVISION_BY_ZERO
@@ -127,17 +135,20 @@ enum ArithmeticError @entity {
 
 # Event: An account has delegated their vote to another account.
 type Delegated @entity {
+  id: ID!
   who: String!
   target: String!
 }
 
 # Event: An account has cancelled a previous delegation operation.
 type Undelegated @entity {
+  id: ID!
   account: String!
 }
 
 # Event: An external proposal has been vetoed.
 type Vetoed @entity {
+  id: ID!
   who: String!
   proposal_hash: String!
   until: Int!
@@ -145,6 +156,7 @@ type Vetoed @entity {
 
 # Event: A proposal's preimage was noted, and the deposit taken.
 type PreimageNoted @entity {
+  id: ID!
   proposal_hash: String!
   who: String!
   deposit: BigInt!
@@ -152,6 +164,7 @@ type PreimageNoted @entity {
 
 # Event: A proposal preimage was removed and used (the deposit was returned).
 type PreimageUsed @entity {
+  id: ID!
   proposal_hash: String!
   provider: String!
   deposit: BigInt!
@@ -159,18 +172,21 @@ type PreimageUsed @entity {
 
 # Event: A proposal could not be executed because its preimage was invalid.
 type PreimageInvalid @entity {
+  id: ID!
   proposal_hash: String!
   ref_index: Int!
 }
 
 # Event: A proposal could not be executed because its preimage was missing.
 type PreimageMissing @entity {
+  id: ID!
   proposal_hash: String!
   ref_index: Int!
 }
 
 # Event: A registered preimage was removed and the deposit collected by the reaper.
 type PreiamgeReaped @entity {
+  id: ID!
   proposal_hash: String!
   provider: String!
   deposit: BigInt!
@@ -179,11 +195,13 @@ type PreiamgeReaped @entity {
 
 # Event: A proposal_hash has been blacklisted permanently.
 type Blacklisted @entity {
+  id: ID!
   proposal_hash: String!
 }
 
 # Event: An account has voted in a referendum.
 type Voted @entity {
+  id: ID!
   voter: String!
   ref_index: Int!
   voteType: VoteType!
@@ -194,7 +212,7 @@ type Voted @entity {
 }
 
 # A vote for a referendum of a particular account.
-enum VoteType @entity {
+enum VoteType {
   # A standard vote, one-way (approve or reject) with a given amount of conviction.
   STANDARD
   # A split vote with balances given for both ways, and with no conviction, useful for
@@ -215,7 +233,7 @@ type Vote @entity {
 }
 
 # A value denoting the strength of conviction of a vote.
-type Conviction @entity {
+enum Conviction {
   # 0.1x votes, unlocked.
   NONE
   # 1x votes, locked for an enactment period following a successful vote.
@@ -241,6 +259,7 @@ type VoteSplit @entity {
 
 # Event: An account has secconded a proposal.
 type Seconded @entity {
+  id: ID!
   seconder: String!
   prop_index: Int!
 }
