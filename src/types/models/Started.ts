@@ -20,6 +20,10 @@ export class Started implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public ref_index: number;
 
     public threshold: VoteThreshold;

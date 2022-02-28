@@ -16,6 +16,10 @@ export class Undelegated implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public account: string;
 
 

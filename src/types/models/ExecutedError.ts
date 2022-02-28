@@ -24,6 +24,10 @@ export class ExecutedError implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public type?: DispatchError;
 
     public other?: string;

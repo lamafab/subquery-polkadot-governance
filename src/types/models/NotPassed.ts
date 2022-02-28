@@ -16,6 +16,10 @@ export class NotPassed implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public ref_index: number;
 
 

@@ -1,6 +1,8 @@
 # Event: A motion has been proposed by a public account.
 type Proposed @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_index: Int!
   deposit: BigInt!
 }
@@ -8,6 +10,8 @@ type Proposed @entity {
 # Event: A public proposal has been tabled for referendum vote.
 type Tabled @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_index: Int!
   deposit: BigInt!
   depositors: [String!]!
@@ -16,11 +20,15 @@ type Tabled @entity {
 # Event: An external proposal has been tabled.
 type ExternalTabled @entity {
   id: ID!
+  block: String!
+  timestamp: String!
 }
 
 # Event: A referendum has begun.
 type Started @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   ref_index: Int!
   threshold: VoteThreshold!
 }
@@ -35,24 +43,32 @@ enum VoteThreshold {
 # A proposal has been approved by referendum.
 type Passed @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   ref_index: Int!
 }
 
 # Event: A proposal has been rejected by referendum.
 type NotPassed @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   ref_index: Int!
 }
 
 # Event: A referendum has been cancelled.
 type Cancelled @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   ref_index: Int!
 }
 
 # Event: A proposal has been enacted.
 type Executed @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   ref_index: Int!
   resultType: dispatchResult!
   # Non-null if `resultType == dispatchResult::ERR`
@@ -67,6 +83,8 @@ enum dispatchResult {
 # More information about the dispatch error.
 type executedError @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   type: DispatchError
   # Non-null if `type == DispatchError::OTHER`
   other: String
@@ -103,6 +121,8 @@ enum DispatchError {
 # Reason why a pallet call failed.
 type ModuleError @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   # Module index, matching the metadata module index.
   index: Int!
   # Module specific error value.
@@ -139,6 +159,8 @@ enum ArithmeticError {
 # Event: An account has delegated their vote to another account.
 type Delegated @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   who: String!
   target: String!
 }
@@ -146,12 +168,16 @@ type Delegated @entity {
 # Event: An account has cancelled a previous delegation operation.
 type Undelegated @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   account: String!
 }
 
 # Event: An external proposal has been vetoed.
 type Vetoed @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   who: String!
   proposal_hash: String!
   until: Int!
@@ -160,6 +186,8 @@ type Vetoed @entity {
 # Event: A proposal's preimage was noted, and the deposit taken.
 type PreimageNoted @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_hash: String!
   who: String!
   deposit: BigInt!
@@ -168,6 +196,8 @@ type PreimageNoted @entity {
 # Event: A proposal preimage was removed and used (the deposit was returned).
 type PreimageUsed @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_hash: String!
   provider: String!
   deposit: BigInt!
@@ -176,6 +206,8 @@ type PreimageUsed @entity {
 # Event: A proposal could not be executed because its preimage was invalid.
 type PreimageInvalid @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_hash: String!
   ref_index: Int!
 }
@@ -183,6 +215,8 @@ type PreimageInvalid @entity {
 # Event: A proposal could not be executed because its preimage was missing.
 type PreimageMissing @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_hash: String!
   ref_index: Int!
 }
@@ -190,6 +224,8 @@ type PreimageMissing @entity {
 # Event: A registered preimage was removed and the deposit collected by the reaper.
 type PreiamgeReaped @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_hash: String!
   provider: String!
   deposit: BigInt!
@@ -199,12 +235,16 @@ type PreiamgeReaped @entity {
 # Event: A proposal_hash has been blacklisted permanently.
 type Blacklisted @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   proposal_hash: String!
 }
 
 # Event: An account has voted in a referendum.
 type Voted @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   voter: String!
   ref_index: Int!
   voteType: VoteType!
@@ -226,6 +266,8 @@ enum VoteType {
 # A value denoting the strength of conviction of a vote.
 type VoteStandard @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   vote: Vote!
   balance: BigInt!
 }
@@ -233,6 +275,8 @@ type VoteStandard @entity {
 # A number of lock periods, plus a vote, one way or the other.
 type Vote @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   aye: Boolean
   conviction: Conviction
 }
@@ -259,6 +303,8 @@ enum Conviction {
 # parachains when voting.
 type VoteSplit @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   aye: BigInt!
   nay: BigInt!
 }
@@ -266,6 +312,8 @@ type VoteSplit @entity {
 # Event: An account has secconded a proposal.
 type Seconded @entity {
   id: ID!
+  block: String!
+  timestamp: String!
   seconder: String!
   prop_index: Int!
 }

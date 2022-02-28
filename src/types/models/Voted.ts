@@ -20,6 +20,10 @@ export class Voted implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public voter: string;
 
     public ref_index: number;

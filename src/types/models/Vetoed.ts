@@ -16,6 +16,10 @@ export class Vetoed implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public who: string;
 
     public proposal_hash: string;

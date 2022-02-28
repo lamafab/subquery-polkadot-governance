@@ -16,6 +16,10 @@ export class PreimageUsed implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public proposal_hash: string;
 
     public provider: string;

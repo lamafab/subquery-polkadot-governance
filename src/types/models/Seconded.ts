@@ -16,6 +16,10 @@ export class Seconded implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public seconder: string;
 
     public prop_index: number;

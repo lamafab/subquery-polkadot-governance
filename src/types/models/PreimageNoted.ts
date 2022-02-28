@@ -16,6 +16,10 @@ export class PreimageNoted implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public proposal_hash: string;
 
     public who: string;

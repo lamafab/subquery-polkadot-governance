@@ -16,6 +16,10 @@ export class Delegated implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
     public who: string;
 
     public target: string;

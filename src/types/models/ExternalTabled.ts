@@ -16,6 +16,10 @@ export class ExternalTabled implements Entity {
 
     public id: string;
 
+    public block: string;
+
+    public timestamp: string;
+
 
     async save(): Promise<void>{
         let id = this.id;

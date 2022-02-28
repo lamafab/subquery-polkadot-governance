@@ -18,7 +18,7 @@ export {Cancelled} from "./Cancelled"
 
 export {Executed} from "./Executed"
 
-export {ExecutedError} from "./executedError"
+export {ExecutedError} from "./ExecutedError"
 
 export {ModuleError} from "./ModuleError"
 
