@@ -14,6 +14,8 @@ export class ModuleError implements Entity {
     }
 
 
+    public id: string;
+
     public index: number;
 
     public error: number;

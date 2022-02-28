@@ -34,6 +34,7 @@ enum VoteThreshold {
 
 # A proposal has been approved by referendum.
 type Passed @entity {
+  id: ID!
   ref_index: Int!
 }
 
@@ -65,6 +66,7 @@ enum dispatchResult {
 
 # More information about the dispatch error.
 type executedError @entity {
+  id: ID!
   type: DispatchError
   # Non-null if `type == DispatchError::OTHER`
   other: String
@@ -100,6 +102,7 @@ enum DispatchError {
 
 # Reason why a pallet call failed.
 type ModuleError @entity {
+  id: ID!
   # Module index, matching the metadata module index.
   index: Int!
   # Module specific error value.
@@ -222,12 +225,14 @@ enum VoteType {
 
 # A value denoting the strength of conviction of a vote.
 type VoteStandard @entity {
+  id: ID!
   vote: Vote!
   balance: BigInt!
 }
 
 # A number of lock periods, plus a vote, one way or the other.
 type Vote @entity {
+  id: ID!
   aye: Boolean
   conviction: Conviction
 }
@@ -253,6 +258,7 @@ enum Conviction {
 # A split vote with balances given for both ways, and with no conviction, useful for
 # parachains when voting.
 type VoteSplit @entity {
+  id: ID!
   aye: BigInt!
   nay: BigInt!
 }

@@ -14,6 +14,8 @@ export class VoteStandard implements Entity {
     }
 
 
+    public id: string;
+
     public voteId: string;
 
     public balance: bigint;

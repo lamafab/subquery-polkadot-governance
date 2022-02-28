@@ -18,6 +18,8 @@ export class Vote implements Entity {
     }
 
 
+    public id: string;
+
     public aye?: boolean;
 
     public conviction?: Conviction;

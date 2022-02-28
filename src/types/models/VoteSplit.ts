@@ -14,6 +14,8 @@ export class VoteSplit implements Entity {
     }
 
 
+    public id: string;
+
     public aye: bigint;
 
     public nay: bigint;

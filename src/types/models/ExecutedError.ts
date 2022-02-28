@@ -22,6 +22,8 @@ export class ExecutedError implements Entity {
     }
 
 
+    public id: string;
+
     public type?: DispatchError;
 
     public other?: string;

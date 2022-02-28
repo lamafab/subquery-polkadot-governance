@@ -14,6 +14,8 @@ export class Passed implements Entity {
     }
 
 
+    public id: string;
+
     public ref_index: number;
 
 
