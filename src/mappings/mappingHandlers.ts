@@ -1,6 +1,6 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled } from "../types";
-import { Balance, PropIndex, AccountId } from "@polkadot/types/interfaces";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold } from "../types";
+import { Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive} from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
     /*
@@ -41,11 +41,33 @@ export async function handleTabled(event: SubstrateEvent): Promise<void> {
 }
 
 export async function handleExternalTabled(event: SubstrateEvent): Promise<void> {
-    const { event: { data: [prop_idx, deposit, depositors] } } = event;
-    const e = new Tabled(`${event.block.block.header.number}-${event.idx.toString()}`);
+    const e = new ExternalTabled(`${event.block.block.header.number}-${event.idx.toString()}`);
 
     e.block = event.block.block.hash.toHuman();
     e.timestamp = new Date().toISOString();
+
+    await e.save();
+}
+
+export async function handleStarted(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [ref_index, threshold] } } = event;
+    const e = new Started(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.ref_index = (ref_index as ReferendumIndex).toNumber();
+
+    let vote;
+    let t = (threshold as VoteThresholdPrimitive);
+    if (t.isSuperMajorityAgainst) {
+        vote = VoteThreshold.SUPER_MAJORITY_APPROVE
+    } else if (t.isSuperMajorityAgainst) {
+        vote = VoteThreshold.SUPER_MAJORITY_AGAINST
+    } else if (t.isSimpleMajority) {
+        vote = VoteThreshold.SIMPLE_MAJORITY;
+    }
+
+    e.threshold = vote;
 
     await e.save();
 }
