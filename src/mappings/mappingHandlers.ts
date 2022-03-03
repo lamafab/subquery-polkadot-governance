@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed } from "../types";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed, PreimageNoted } from "../types";
 import { Hash, BlockNumber, Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive } from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
@@ -149,6 +149,19 @@ export async function handleVetoed(event: SubstrateEvent): Promise<void> {
     e.who = (who as AccountId).toString();
     e.proposal_hash = (proposal_hash as Hash).toString();
     e.until = (until as BlockNumber).toNumber();
+
+    await e.save();
+}
+
+export async function handlePreimageNoted(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [proposal_hash, who, deposit] } } = event;
+    const e = new PreimageNoted(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.proposal_hash = (proposal_hash as Hash).toString();
+    e.who = (who as AccountId).toString();
+    e.deposit = (deposit as Balance).toBigInt();
 
     await e.save();
 }
