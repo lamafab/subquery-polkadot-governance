@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed } from "../types";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed } from "../types";
 import { Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive} from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
@@ -74,7 +74,18 @@ export async function handleStarted(event: SubstrateEvent): Promise<void> {
 
 export async function handlePassed(event: SubstrateEvent): Promise<void> {
     const { event: { data: [ref_index, threshold] } } = event;
-    const e = new Started(`${event.block.block.header.number}-${event.idx.toString()}`);
+    const e = new Passed(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.ref_index = (ref_index as ReferendumIndex).toNumber();
+
+    await e.save();
+}
+
+export async function handleNotPassed(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [ref_index, threshold] } } = event;
+    const e = new NotPassed(`${event.block.block.header.number}-${event.idx.toString()}`);
 
     e.block = event.block.block.hash.toHuman();
     e.timestamp = new Date().toISOString();
