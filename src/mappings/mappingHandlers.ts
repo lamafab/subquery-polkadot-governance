@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled } from "../types";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated} from "../types";
 import { Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive } from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
@@ -73,7 +73,7 @@ export async function handleStarted(event: SubstrateEvent): Promise<void> {
 }
 
 export async function handlePassed(event: SubstrateEvent): Promise<void> {
-    const { event: { data: [ref_index, threshold] } } = event;
+    const { event: { data: [ref_index ] } } = event;
     const e = new Passed(`${event.block.block.header.number}-${event.idx.toString()}`);
 
     e.block = event.block.block.hash.toHuman();
@@ -84,7 +84,7 @@ export async function handlePassed(event: SubstrateEvent): Promise<void> {
 }
 
 export async function handleNotPassed(event: SubstrateEvent): Promise<void> {
-    const { event: { data: [ref_index, threshold] } } = event;
+    const { event: { data: [ref_index] } } = event;
     const e = new NotPassed(`${event.block.block.header.number}-${event.idx.toString()}`);
 
     e.block = event.block.block.hash.toHuman();
@@ -95,12 +95,36 @@ export async function handleNotPassed(event: SubstrateEvent): Promise<void> {
 }
 
 export async function handleCancelled(event: SubstrateEvent): Promise<void> {
-    const { event: { data: [ref_index, threshold] } } = event;
+    const { event: { data: [ref_index] } } = event;
     const e = new Cancelled(`${event.block.block.header.number}-${event.idx.toString()}`);
 
     e.block = event.block.block.hash.toHuman();
     e.timestamp = new Date().toISOString();
     e.ref_index = (ref_index as ReferendumIndex).toNumber();
+
+    await e.save();
+}
+
+export async function handleExecuted(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [ref_index, result] } } = event;
+    const e = new Cancelled(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+
+    // TODO
+
+    await e.save();
+}
+
+export async function handleDelegated(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [who, target] } } = event;
+    const e = new Delegated(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.who = (who as AccountId).toString();
+    e.target = (target as AccountId).toString();
 
     await e.save();
 }
