@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated} from "../types";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated} from "../types";
 import { Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive } from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
@@ -125,6 +125,17 @@ export async function handleDelegated(event: SubstrateEvent): Promise<void> {
     e.timestamp = new Date().toISOString();
     e.who = (who as AccountId).toString();
     e.target = (target as AccountId).toString();
+
+    await e.save();
+}
+
+export async function handleUndelegated(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [account] } } = event;
+    const e = new Undelegated(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.account = (account as AccountId).toString();
 
     await e.save();
 }
