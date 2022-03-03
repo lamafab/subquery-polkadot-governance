@@ -1,5 +1,5 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed, PreimageNoted, PreimageUsed } from "../types";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed, PreimageNoted, PreimageUsed, PreimageInvalid, PreimageMissing } from "../types";
 import { Hash, BlockNumber, Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive } from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
@@ -175,6 +175,30 @@ export async function handlePreimageUsed(event: SubstrateEvent): Promise<void> {
     e.proposal_hash = (proposal_hash as Hash).toString();
     e.provider = (provider as AccountId).toString();
     e.deposit = (deposit as Balance).toBigInt();
+
+    await e.save();
+}
+
+export async function handlePreimageInvalid(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [proposal_hash, ref_index] } } = event;
+    const e = new PreimageInvalid(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.proposal_hash = (proposal_hash as Hash).toString();
+    e.ref_index = (ref_index as ReferendumIndex).toNumber();
+
+    await e.save();
+}
+
+export async function handlePreimageMissing(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [proposal_hash, ref_index] } } = event;
+    const e = new PreimageMissing(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.proposal_hash = (proposal_hash as Hash).toString();
+    e.ref_index = (ref_index as ReferendumIndex).toNumber();
 
     await e.save();
 }
