@@ -1,6 +1,6 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated} from "../types";
-import { Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive } from "@polkadot/types/interfaces";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed } from "../types";
+import { Hash, BlockNumber, Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive } from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
     /*
@@ -73,7 +73,7 @@ export async function handleStarted(event: SubstrateEvent): Promise<void> {
 }
 
 export async function handlePassed(event: SubstrateEvent): Promise<void> {
-    const { event: { data: [ref_index ] } } = event;
+    const { event: { data: [ref_index] } } = event;
     const e = new Passed(`${event.block.block.header.number}-${event.idx.toString()}`);
 
     e.block = event.block.block.hash.toHuman();
@@ -136,6 +136,19 @@ export async function handleUndelegated(event: SubstrateEvent): Promise<void> {
     e.block = event.block.block.hash.toHuman();
     e.timestamp = new Date().toISOString();
     e.account = (account as AccountId).toString();
+
+    await e.save();
+}
+
+export async function handleVetoed(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [who, proposal_hash, until] } } = event;
+    const e = new Vetoed(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.who = (who as AccountId).toString();
+    e.proposal_hash = (proposal_hash as Hash).toString();
+    e.until = (until as BlockNumber).toNumber();
 
     await e.save();
 }
