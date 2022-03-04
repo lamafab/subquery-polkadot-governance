@@ -249,9 +249,9 @@ type Voted @entity {
   ref_index: Int!
   voteType: VoteType!
   # Non-null if `vote == DispatchError::STANDARD`
-  voteStandard: VoteStandard!
+  voteStandard: VoteStandard
   # Non-null if `vote == DispatchError::SPLIT`
-  voteSplit: VoteSplit!
+  voteSplit: VoteSplit
 }
 
 # A vote for a referendum of a particular account.
@@ -305,8 +305,8 @@ type VoteSplit @entity {
   id: ID!
   block: String!
   timestamp: String!
-  aye: BigInt!
-  nay: BigInt!
+  aye: BigInt
+  nay: BigInt
 }
 
 # Event: An account has secconded a proposal.

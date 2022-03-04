@@ -20,9 +20,9 @@ export class VoteSplit implements Entity {
 
     public timestamp: string;
 
-    public aye: bigint;
+    public aye?: bigint;
 
-    public nay: bigint;
+    public nay?: bigint;
 
 
     async save(): Promise<void>{

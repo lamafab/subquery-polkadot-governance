@@ -30,9 +30,9 @@ export class Voted implements Entity {
 
     public voteType: VoteType;
 
-    public voteStandardId: string;
+    public voteStandardId?: string;
 
-    public voteSplitId: string;
+    public voteSplitId?: string;
 
 
     async save(): Promise<void>{

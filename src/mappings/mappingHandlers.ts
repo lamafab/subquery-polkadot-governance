@@ -1,6 +1,6 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed, PreimageNoted, PreimageUsed, PreimageInvalid, PreimageMissing, PreiamgeReaped } from "../types";
-import { Hash, BlockNumber, Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive } from "@polkadot/types/interfaces";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed, PreimageNoted, PreimageUsed, PreimageInvalid, PreimageMissing, PreiamgeReaped, Blacklisted, Voted, VoteType, VoteStandard, VoteSplit, Vote, Conviction } from "../types";
+import { Hash, BlockNumber, Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive, AccountVote as AccountVotePrimitive } from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
     /*
@@ -213,6 +213,90 @@ export async function handlePreimageReaped(event: SubstrateEvent): Promise<void>
     e.provider = (provider as AccountId).toString();
     e.deposit = (deposit as Balance).toBigInt();
     e.reaper = (reaper as AccountId).toString();
+
+    await e.save();
+}
+
+export async function handleBlacklisted(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [proposal_hash] } } = event;
+    const e = new Blacklisted(`${event.block.block.header.number}-${event.idx.toString()}`);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.proposal_hash = (proposal_hash as Hash).toString();
+
+    await e.save();
+}
+
+export async function handleVoted(event: SubstrateEvent): Promise<void> {
+    const { event: { data: [voter, ref_index, vote] } } = event;
+    const id = `${event.block.block.header.number}-${event.idx.toString()}`;
+    const e = new Voted(id);
+
+    e.block = event.block.block.hash.toHuman();
+    e.timestamp = new Date().toISOString();
+    e.voter = (voter as AccountId).toString();
+    e.ref_index = (ref_index as ReferendumIndex).toNumber();
+
+    let vote_ty;
+    let t = (vote as AccountVotePrimitive);
+    if (t.isStandard) {
+        e.voteType = VoteType.STANDARD;
+
+        const vote = new Vote(`${id}-vote`);
+        if (t.asStandard.vote.isAye) {
+            vote.aye = true;
+            vote.conviction = null;
+        } else {
+            let r;
+            const c = t.asStandard.vote.conviction;
+            if (c.isNone) {
+                r = Conviction.NONE;
+            } else if (c.isLocked1x) {
+                r = Conviction.LOCKED_1X;
+            } else if (c.isLocked2x) {
+                r = Conviction.LOCKED_2X;
+            } else if (c.isLocked3x) {
+                r = Conviction.LOCKED_3X;
+            } else if (c.isLocked4x) {
+                r = Conviction.LOCKED_4X;
+            } else if (c.isLocked5x) {
+                r = Conviction.LOCKED_5X;
+            } else if (c.isLocked6x) {
+                r = Conviction.LOCKED_6X;
+            }
+
+            vote.aye = false;
+            vote.conviction = r;
+        }
+
+        await vote.save();
+
+        const vstd = new VoteStandard(`${id}-standard`);
+        vstd.voteId = vote.id.toString();
+        vstd.balance = t.asStandard.balance.toBigInt();
+
+        e.voteStandardId = vstd.id.toString();
+        e.voteSplitId = null;
+    } else if (t.isSplit) {
+        vote_ty = VoteType.SPLIT;
+
+        const f = new VoteSplit(`${id}-split`);
+
+        const aye = t.asSplit.aye;
+        const nay = t.asSplit.nay;
+
+        if (aye != null) {
+            f.aye = aye.toBigInt();
+        } else if (nay != null) {
+            f.nay = nay.toBigInt();
+        }
+
+        await f.save();
+
+        e.voteStandardId = null;
+        e.voteSplitId = f.id.toString();
+    }
 
     await e.save();
 }
