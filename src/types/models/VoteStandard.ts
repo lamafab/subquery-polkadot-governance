@@ -16,10 +16,6 @@ export class VoteStandard implements Entity {
 
     public id: string;
 
-    public block: string;
-
-    public timestamp: string;
-
     public voteId: string;
 
     public balance: bigint;

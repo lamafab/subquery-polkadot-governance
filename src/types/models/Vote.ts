@@ -20,10 +20,6 @@ export class Vote implements Entity {
 
     public id: string;
 
-    public block: string;
-
-    public timestamp: string;
-
     public aye?: boolean;
 
     public conviction?: Conviction;

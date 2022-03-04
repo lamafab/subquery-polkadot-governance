@@ -266,8 +266,6 @@ enum VoteType {
 # A value denoting the strength of conviction of a vote.
 type VoteStandard @entity {
   id: ID!
-  block: String!
-  timestamp: String!
   vote: Vote!
   balance: BigInt!
 }
@@ -275,8 +273,6 @@ type VoteStandard @entity {
 # A number of lock periods, plus a vote, one way or the other.
 type Vote @entity {
   id: ID!
-  block: String!
-  timestamp: String!
   aye: Boolean
   conviction: Conviction
 }
@@ -303,8 +299,6 @@ enum Conviction {
 # parachains when voting.
 type VoteSplit @entity {
   id: ID!
-  block: String!
-  timestamp: String!
   aye: BigInt
   nay: BigInt
 }
