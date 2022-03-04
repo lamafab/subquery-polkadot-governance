@@ -16,15 +16,9 @@ export class ModuleError implements Entity {
 
     public id: string;
 
-    public block: string;
-
-    public timestamp: string;
-
     public index: number;
 
     public error: number;
-
-    public message?: string;
 
 
     async save(): Promise<void>{

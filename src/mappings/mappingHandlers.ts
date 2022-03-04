@@ -1,6 +1,10 @@
 import { SubstrateExtrinsic, SubstrateEvent, SubstrateBlock } from "@subql/types";
-import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed, Cancelled, Executed, Delegated, Undelegated, Vetoed, PreimageNoted, PreimageUsed, PreimageInvalid, PreimageMissing, PreiamgeReaped, Blacklisted, Voted, VoteType, VoteStandard, VoteSplit, Vote, Conviction } from "../types";
-import { Hash, BlockNumber, Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive, AccountVote as AccountVotePrimitive } from "@polkadot/types/interfaces";
+import { Proposed, Tabled, ExternalTabled, Started, VoteThreshold, Passed, NotPassed,
+    Cancelled, Executed, Delegated, Undelegated, Vetoed, PreimageNoted, PreimageUsed,
+    PreimageInvalid, PreimageMissing, PreiamgeReaped, Blacklisted, Voted, VoteType, 
+    VoteStandard, VoteSplit, Vote, Conviction, dispatchResult, ExecutedError, 
+    DispatchError, ModuleError, TokenError, ArithmeticError } from "../types";
+import { Hash, BlockNumber, Balance, PropIndex, ReferendumIndex, AccountId, VoteThreshold as VoteThresholdPrimitive, DispatchResult as DispatchResultPrimitive, AccountVote as AccountVotePrimitive } from "@polkadot/types/interfaces";
 
 export async function handleEvent(event: SubstrateEvent): Promise<void> {
     /*
@@ -107,12 +111,75 @@ export async function handleCancelled(event: SubstrateEvent): Promise<void> {
 
 export async function handleExecuted(event: SubstrateEvent): Promise<void> {
     const { event: { data: [ref_index, result] } } = event;
-    const e = new Cancelled(`${event.block.block.header.number}-${event.idx.toString()}`);
+    const id = `${event.block.block.header.number}-${event.idx.toString()}`;
+    const e = new Executed(id);
 
     e.block = event.block.block.hash.toHuman();
     e.timestamp = new Date().toISOString();
+    e.ref_index = (ref_index as ReferendumIndex).toNumber();
 
-    // TODO
+    const res = (result as DispatchResultPrimitive);
+    if (res.isOk) {
+        e.resultType = dispatchResult.OK;
+        e.errorId = null;
+    } else if (res.isErr) {
+        e.resultType = dispatchResult.ERR;
+
+        // Setup Error
+        const err = new ExecutedError(`${id}-exe-err`);
+
+        // TODO: `TooManyConsumers` is missing?
+        if (res.asErr.isOther) {
+            err.type = DispatchError.OTHER;
+        } else if (res.asErr.isCannotLookup) {
+            err.type = DispatchError.CANNOT_LOOKUP;
+        } else if (res.asErr.isBadOrigin) {
+            err.type = DispatchError.BAD_ORIGIN;
+        } else if (res.asErr.isModule) {
+            err.type = DispatchError.MODULE;
+
+            // Setup `ModuleError`.
+            const mod_err = new ModuleError(`${id}-mod-err`)
+            mod_err.index = res.asErr.asModule.index.toNumber()
+            mod_err.error = res.asErr.asModule.error.toNumber()
+            await mod_err.save();
+
+            // Commit to primariy type.
+            err.moduleId = mod_err.id.toString();
+        } else if (res.asErr.isConsumerRemaining) {
+            err.type = DispatchError.CONSUMER_REMAINING;
+        } else if (res.asErr.isNoProviders) {
+            err.type = DispatchError.NO_PROVIDERS;
+        } else if (res.asErr.isToken) {
+            err.type = DispatchError.TOKEN;
+
+            const t = res.asErr.asToken;
+            if (t.isNoFunds) {
+                err.token = TokenError.NO_FUNDS;
+            } else if (t.isWouldDie) {
+                err.token = TokenError.WOULD_DIE;
+            } else if (t.isBelowMinimum) {
+                err.token = TokenError.BELOW_MINIMUM;
+            } else if (t.isCannotCreate) {
+                err.token = TokenError.CANNOT_CREATE;
+            } else if (t.isUnknownAsset) {
+                err.token = TokenError.UNKNOWN_ASSET;
+            } else if (t.isFrozen) {
+                err.token = TokenError.FROZEN;
+            } else if (t.isUnderflow) {
+                err.arithmetic = ArithmeticError.UNDERFLOW;
+            } else if (t.isOverflow) {
+                err.arithmetic = ArithmeticError.OVERFLOW;
+            }
+        } else if (res.asErr.isArithmetic) {
+            err.type = DispatchError.ARITHMETIC;
+        }
+
+        await err.save();
+
+        // Commit to primary type.
+        e.errorId = err.id.toString();
+    }
 
     await e.save();
 }

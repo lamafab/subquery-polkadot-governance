@@ -83,11 +83,7 @@ enum dispatchResult {
 # More information about the dispatch error.
 type executedError @entity {
   id: ID!
-  block: String!
-  timestamp: String!
   type: DispatchError
-  # Non-null if `type == DispatchError::OTHER`
-  other: String
   # Non-null if `type == DispatchError::MODULE`
   module: ModuleError 
   # Non-null if `type == DispatchError::TOKEN`
@@ -121,14 +117,10 @@ enum DispatchError {
 # Reason why a pallet call failed.
 type ModuleError @entity {
   id: ID!
-  block: String!
-  timestamp: String!
   # Module index, matching the metadata module index.
   index: Int!
   # Module specific error value.
   error: Int!
-  # Optional error message.
-  message: String
 }
 
 # Description of what went wrong when trying to complete an operation on a token.
