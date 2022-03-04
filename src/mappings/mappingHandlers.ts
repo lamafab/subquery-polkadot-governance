@@ -238,11 +238,9 @@ export async function handleVoted(event: SubstrateEvent): Promise<void> {
     e.voter = (voter as AccountId).toString();
     e.ref_index = (ref_index as ReferendumIndex).toNumber();
 
-    let vote_ty;
     let t = (vote as AccountVotePrimitive);
     if (t.isStandard) {
-        e.voteType = VoteType.STANDARD;
-
+        // Setup `Vote`.
         const vote = new Vote(`${id}-vote`);
         if (t.asStandard.vote.isAye) {
             vote.aye = true;
@@ -272,30 +270,33 @@ export async function handleVoted(event: SubstrateEvent): Promise<void> {
 
         await vote.save();
 
+        // Setup `VoteStandard`.
         const vstd = new VoteStandard(`${id}-standard`);
         vstd.voteId = vote.id.toString();
         vstd.balance = t.asStandard.balance.toBigInt();
 
+        // Commit to primary type.
+        e.voteType = VoteType.STANDARD;
         e.voteStandardId = vstd.id.toString();
         e.voteSplitId = null;
     } else if (t.isSplit) {
-        vote_ty = VoteType.SPLIT;
-
-        const f = new VoteSplit(`${id}-split`);
-
         const aye = t.asSplit.aye;
         const nay = t.asSplit.nay;
 
+        // Setup `VoteSplit`.
+        const vsplit = new VoteSplit(`${id}-split`);
         if (aye != null) {
-            f.aye = aye.toBigInt();
+            vsplit.aye = aye.toBigInt();
         } else if (nay != null) {
-            f.nay = nay.toBigInt();
+            vsplit.nay = nay.toBigInt();
         }
 
-        await f.save();
+        await vsplit.save();
 
+        // Commit to primary type.
+        e.voteType = VoteType.STANDARD;
         e.voteStandardId = null;
-        e.voteSplitId = f.id.toString();
+        e.voteSplitId = vsplit.id.toString();
     }
 
     await e.save();
