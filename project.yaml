@@ -16,12 +16,98 @@ dataSources:
     mapping:
       file: ./dist/index.js
       handlers:
-        - handler: handleBlock
-          kind: substrate/BlockHandler
-        - handler: handleEvent
+        - handler: handleProposed
           kind: substrate/EventHandler
           filter:
-            module: balances
-            method: Deposit
-        - handler: handleCall
-          kind: substrate/CallHandler
+            module: democracy
+            method: Proposed
+        - handler: handleTabled
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Tabled
+        - handler: handleExternalTabled
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: ExternalTabled
+        - handler: handleStarted
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Started
+        - handler: handlePassed
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Passed
+        - handler: handleNotPassed
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: NotPassed
+        - handler: handleCancelled
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Cancelled
+        - handler: handleExecuted
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Executed
+        - handler: handleDelegated
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Delegated
+        - handler: handleUndelegated
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Undelegated
+        - handler: handleVetoed
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Vetoed
+        - handler: handlePreimageNoted
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: PreimageNoted
+        - handler: handlePreimageUsed
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: PreimageUsed
+        - handler: handlePreimageInvalid
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: PreimageInvalid
+        - handler: handlePreimageMissing
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: PreimageMissing
+        - handler: handlePreimageReaped
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: PreimageReaped
+        - handler: handleBlacklisted
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Blacklisted
+        - handler: handleVoted
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Voted
+        - handler: handleSeconded
+          kind: substrate/EventHandler
+          filter:
+            module: democracy
+            method: Seconded

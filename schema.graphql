@@ -214,7 +214,7 @@ type PreimageMissing @entity {
 }
 
 # Event: A registered preimage was removed and the deposit collected by the reaper.
-type PreiamgeReaped @entity {
+type PreimageReaped @entity {
   id: ID!
   block: String!
   timestamp: String!

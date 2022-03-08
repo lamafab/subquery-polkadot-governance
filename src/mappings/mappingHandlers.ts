@@ -20,7 +20,7 @@ import {
   PreimageUsed,
   PreimageInvalid,
   PreimageMissing,
-  PreiamgeReaped,
+  PreimageReaped,
   Blacklisted,
   Voted,
   VoteType,
@@ -34,6 +34,7 @@ import {
   ModuleError,
   TokenError,
   ArithmeticError,
+  Seconded,
 } from "../types";
 import {
   Hash,
@@ -46,18 +47,6 @@ import {
   DispatchResult as DispatchResultPrimitive,
   AccountVote as AccountVotePrimitive,
 } from "@polkadot/types/interfaces";
-
-export async function handleEvent(event: SubstrateEvent): Promise<void> {
-  /*
-    const {event: {data: [account, balance]}} = event;
-    //Retrieve the record by its ID
-    const record = await StarterEntity.get(event.block.block.header.hash.toString());
-    record.field2 = account.toString();
-    //Big integer type Balance of a transfer event
-    record.field3 = (balance as Balance).toBigInt();
-    await record.save();
-    */
-}
 
 export async function handleProposed(event: SubstrateEvent): Promise<void> {
   const {
@@ -411,7 +400,7 @@ export async function handlePreimageReaped(
       data: [proposal_hash, provider, deposit, reaper],
     },
   } = event;
-  const e = new PreiamgeReaped(
+  const e = new PreimageReaped(
     `${event.block.block.header.number}-${event.idx.toString()}`
   );
 
@@ -513,6 +502,24 @@ export async function handleVoted(event: SubstrateEvent): Promise<void> {
     e.voteType = VoteType.STANDARD;
     e.voteSplitId = vsplit.id.toString();
   }
+
+  await e.save();
+}
+
+export async function handleSeconded(event: SubstrateEvent): Promise<void> {
+  const {
+    event: {
+      data: [seconder, prop_index],
+    },
+  } = event;
+  const e = new Seconded(
+    `${event.block.block.header.number}-${event.idx.toString()}`
+  );
+
+  e.block = event.block.block.hash.toHuman();
+  e.timestamp = new Date().toISOString();
+  e.seconder = (seconder as AccountId).toString();
+  e.prop_index = (prop_index as PropIndex).toNumber();
 
   await e.save();
 }

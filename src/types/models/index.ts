@@ -36,7 +36,7 @@ export {PreimageInvalid} from "./PreimageInvalid"
 
 export {PreimageMissing} from "./PreimageMissing"
 
-export {PreiamgeReaped} from "./PreiamgeReaped"
+export {PreimageReaped} from "./PreimageReaped"
 
 export {Blacklisted} from "./Blacklisted"
 
