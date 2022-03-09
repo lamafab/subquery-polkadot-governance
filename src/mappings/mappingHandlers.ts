@@ -480,6 +480,7 @@ export async function handleVoted(event: SubstrateEvent): Promise<void> {
     const vstd = new VoteStandard(`${id}-standard`);
     vstd.voteId = vote.id.toString();
     vstd.balance = vp.asStandard.balance.toBigInt();
+    await vstd.save();
 
     // Commit to primary type.
     e.voteType = VoteType.STANDARD;
@@ -495,7 +496,6 @@ export async function handleVoted(event: SubstrateEvent): Promise<void> {
     } else if (nay != null) {
       vsplit.nay = nay.toBigInt();
     }
-
     await vsplit.save();
 
     // Commit to primary type.
