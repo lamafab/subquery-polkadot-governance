@@ -70,18 +70,18 @@ type Executed @entity {
   block: String!
   timestamp: String!
   ref_index: Int!
-  resultType: dispatchResult!
-  # Non-null if `resultType == dispatchResult::ERR`
-  error: executedError
+  resultType: DispatchResult!
+  # Non-null if `resultType == DispatchResult::ERR`
+  error: ExecutedError
 }
 
-enum dispatchResult {
+enum DispatchResult {
   OK
   ERR
 }
 
 # More information about the dispatch error.
-type executedError @entity {
+type ExecutedError @entity {
   id: ID!
   type: DispatchError
   # Non-null if `type == DispatchError::MODULE`

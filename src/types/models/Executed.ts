@@ -5,7 +5,7 @@ import assert from 'assert';
 
 
 import {
-    dispatchResult,
+    DispatchResult,
 } from '../enums'
 
 
@@ -26,7 +26,7 @@ export class Executed implements Entity {
 
     public ref_index: number;
 
-    public resultType: dispatchResult;
+    public resultType: DispatchResult;
 
     public errorId?: string;
 

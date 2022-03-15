@@ -36,16 +36,16 @@ export class ExecutedError implements Entity {
     async save(): Promise<void>{
         let id = this.id;
         assert(id !== null, "Cannot save ExecutedError entity without an ID");
-        await store.set('executedError', id.toString(), this);
+        await store.set('ExecutedError', id.toString(), this);
     }
     static async remove(id:string): Promise<void>{
         assert(id !== null, "Cannot remove ExecutedError entity without an ID");
-        await store.remove('executedError', id.toString());
+        await store.remove('ExecutedError', id.toString());
     }
 
     static async get(id:string): Promise<ExecutedError | undefined>{
         assert((id !== null && id !== undefined), "Cannot get ExecutedError entity without an ID");
-        const record = await store.get('executedError', id.toString());
+        const record = await store.get('ExecutedError', id.toString());
         if (record){
             return ExecutedError.create(record as ExecutedErrorProps);
         }else{
@@ -56,7 +56,7 @@ export class ExecutedError implements Entity {
 
     static async getByModuleId(moduleId: string): Promise<ExecutedError[] | undefined>{
       
-      const records = await store.getByField('executedError', 'moduleId', moduleId);
+      const records = await store.getByField('ExecutedError', 'moduleId', moduleId);
       return records.map(record => ExecutedError.create(record as ExecutedErrorProps));
       
     }

@@ -28,7 +28,7 @@ import {
   VoteSplit,
   Vote,
   Conviction,
-  dispatchResult,
+  DispatchResult,
   ExecutedError,
   DispatchError,
   ModuleError,
@@ -195,9 +195,9 @@ export async function handleExecuted(event: SubstrateEvent): Promise<void> {
 
   const res = result as DispatchResultPrimitive;
   if (res.isOk) {
-    e.resultType = dispatchResult.OK;
+    e.resultType = DispatchResult.OK;
   } else if (res.isErr) {
-    e.resultType = dispatchResult.ERR;
+    e.resultType = DispatchResult.ERR;
 
     // Setup Error
     const err = new ExecutedError(`${id}-exe-err`);

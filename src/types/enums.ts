@@ -13,7 +13,7 @@ export enum VoteThreshold {
 }
 
 
-export enum dispatchResult {
+export enum DispatchResult {
 
     OK = "OK",
 
